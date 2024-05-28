@@ -1,0 +1,6 @@
+[submodule "Siosk"]
+	path = Siosk
+	url = https://github.com/diddmstjr07/Siosk.git
+[submodule "SioskUI"]
+	path = SioskUI
+	url = https://github.com/diddmstjr07/SioskUI.git
