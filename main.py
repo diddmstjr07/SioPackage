@@ -5,6 +5,7 @@ import time
 import random
 import os
 from Siosk.package.model import API
+from auto.delete import delete_dot_underscore_files
 
 current_working_directory = os.getcwd()
 api = API(token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Fub2Fzay5zaXRlIiwiZXhwIjoxNzE3NDcwMDc5LCJzdWIiOiIzOCJ9._1iLHXYqP5ht71-NUKGlmJYJuDR9m3uoIVGywJSDoa0")
@@ -166,4 +167,5 @@ def main(page: ft.Page):
     # creating("cold", page)
 
 if __name__ == "__main__":
+    delete_dot_underscore_files()
     ft.app(target=main)

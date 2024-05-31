@@ -1,0 +1,15 @@
+appdirs==1.4.4
+certifi==2024.2.2
+charset-normalizer==3.3.2
+google-speech==1.2.0
+idna==3.7
+PyAudio==0.2.14
+requests==2.32.2
+SpeechRecognition==3.10.4
+typing_extensions==4.12.0
+urllib3==2.2.1
+web-cache==1.1.0
+requests
+flet
+requests
+SpeechRecognition==3.10.4
