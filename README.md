@@ -7,7 +7,7 @@ If the above graph is represented as a set of 50 data points (regardless of the 
 <br>it would look like {(1, 49), (2, 48), (3, 47), .... (25, 25), ....., (48, 2), (49, 1), (50, 1)}. <br><br>We actually wrote the code and plotted the CPU usage and time using matplotlib, which plots the graph in python with the y-axis of the graph above, the y-value of the set above the number of threads, and the x-axis of the graph with the x-value of the set above the number of threads used. We found that it is most efficient to set 17 threads to work simultaneously, and let the remaining 33 processes run individually. 
 </p>
 
-<img src="Siosk/image/graph_epoch4.png" alt="Image" style="border-radius: 20px;">
+<img src="assets/graph.png" alt="Image" style="border-radius: 20px;">
 
 <p>How to clone </p>
 
