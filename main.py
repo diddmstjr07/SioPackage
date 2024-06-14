@@ -8,7 +8,7 @@ from Siosk.package.model import API
 from auto.delete import delete_dot_underscore_files
 
 current_working_directory = os.getcwd()
-api = API(token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Fub2Fzay5zaXRlIiwiZXhwIjoxNzE3NDcwMDc5LCJzdWIiOiIzOCJ9._1iLHXYqP5ht71-NUKGlmJYJuDR9m3uoIVGywJSDoa0")
+api = API(token="SioskKioskFixedTokenVerifyingTokenData")
 api.preparing()
 
 # print(current_working_directory)
@@ -161,6 +161,7 @@ def main(page: ft.Page):
 
     animate_containers(page, containers)
     voice = threading.Thread(target=ask_res)
+    time.sleep(15)
     voice.start()
     voice.join()
     # creating("red", page)
