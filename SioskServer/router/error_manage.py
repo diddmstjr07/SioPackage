@@ -1,0 +1,2 @@
+class NoneproperDataError(Exception):
+    pass
