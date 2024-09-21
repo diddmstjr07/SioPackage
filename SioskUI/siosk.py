@@ -12,6 +12,7 @@ from SioskUI.siosk_developer import administrator_page
 from SioskUI.siosk_general_order import from_general_order
 from SioskUI.siosk_senior_order import from_siosk_order
 from Siosk.package.model import API
+from Siosk.package.audio import AudioRecorder
 import sys
 import requests
 import os  
@@ -19,6 +20,7 @@ import os
 current_working_directory = os.path.abspath(".") + "/SioskUI"
 drinks = ["Coffee", "Smoothe", "Beverage", "Tea", "Ade"]
 ip_store = []
+
 
 def resource_path(relative_path):
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
@@ -57,7 +59,9 @@ class UI:
                 token="SioskKioskFixedTokenVerifyingTokenData",
                 url="http://" + ip_address
             ) 
-        self.api.preparing() # Mic selection, storing class elements declaring as instant variable
+        self.recorder = AudioRecorder()
+        self.api.preparing(self.recorder) # Mic selection, storing class elements declaring as instant variable
+        
 
     def main(self, page: ft.Page):
         '''
@@ -200,7 +204,8 @@ class UI:
                         store_getting_lowdata=store_getting_lowdata,
                         data_arrange=data_arrange,
                         current_working_directory=current_working_directory,
-                        sound=self.sound
+                        sound=self.sound,
+                        recorder=self.recorder
                     )
                 )
             elif page.route == "/admininstrator_page":

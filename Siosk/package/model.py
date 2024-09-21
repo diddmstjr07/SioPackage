@@ -1,15 +1,9 @@
 from .neuron import NeuronAggregate
-from google_speech import Speech
 from Siosk.package.anoask import Api
 from Siosk.package.TTS import TextToSpeech
-import time
-from Siosk.package.error_manage import ConnectionRefusedError
-from Siosk.package.error_manage import ServerDownedError
+from Siosk.package.audio import AudioRecorder
 import os
 import six
-import socket
-import requests
-import webbrowser
 import asyncio
 
 class API:
@@ -39,14 +33,15 @@ class API:
     #         print("\033[31m" + '404 Refused Error' + "\033[0m" + ': Server is downed... Please Contact us we will found problem immediately') # 연결 에러인 경우, 서버 다운 메세지 출력
     #         raise ServerDownedError
 
-    def load_models(self):
+    def load_models(self, record: AudioRecorder):
         api = Api(url=self.url) 
-        Neuron = NeuronAggregate() # 음성관련 class 호출 
+        Neuron = NeuronAggregate(record) # 음성관련 class 호출 
         return api, Neuron
 
-    def preparing(self): # 준비 함수 
-        api, Neuron = self.load_models() # api -> get 요청할때 사용, Neuron -> 마이크 선택과 음성 변환
+    def preparing(self, recorder: AudioRecorder): # 준비 함수 
+        api, Neuron = self.load_models(recorder) # api -> get 요청할때 사용, Neuron -> 마이크 선택과 음성 변환
         index = Neuron.Detection() # 마이크 선택
+        recorder.get_mic_selection(index)
         self.api = api # 인스턴스 변수로 선언
         self.index = index # 인스턴스 변수로 선언
         self.Neuron = Neuron # 인스턴스 변수로 선언

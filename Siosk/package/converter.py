@@ -12,26 +12,44 @@ class SpeechToTextConverter:
         self.error_non = speech_recognition.exceptions.UnknownValueError
         self.error_wait = speech_recognition.exceptions.WaitTimeoutError
 
-    def check_microphone(self):
-        detected = []
-        for index, name in enumerate(self.detection.Microphone.list_microphone_names()):
-            detected.append(str(f"[{index}] {name}")) # 존재하는 마이크 append
-        return detected
-
-    def record_audio(output_file: str, duration: int, rate: int = 44100):
+    def record_audio(self):
+        audio = pyaudio.PyAudio()
+        print(self.mic)
+        
+        try:
+            stream = audio.open(
+                format=pyaudio.paInt16,
+                channels=1,  # Set this to 1 for mono or 2 for stereo
+                rate=self.rate,
+                input=True,
+                frames_per_buffer=self.chunk,
+                input_device_index=int(self.mic)  # Use mic as input device index
+            )
+        except Exception as e:
+            print(f"오류 발생: {e}")
+            return
+        
         print("녹음을 시작합니다...")
-        audio_data = sd.rec(int(duration * rate), samplerate=rate, channels=1, dtype='int16')
-        sd.wait()  # 녹음이 끝날 때까지 대기
-        print("녹음을 종료합니다...")
+        self.recording = True
+        while self.recording:
+            data = stream.read(self.chunk)
+            self.frames.append(data)
+            if self.stop_event.is_set():
+                break
+        print("녹음이 완료되었습니다.")
+        stream.stop_stream()
+        stream.close()
+        audio.terminate()
+
+        with wave.open(self.output_file, 'wb') as wf:
+            wf.setnchannels(1)  # Save as mono
+            wf.setsampwidth(audio.get_sample_size(pyaudio.paInt16))
+            wf.setframerate(self.rate)
+            wf.writeframes(b''.join(self.frames))
         
-        with wave.open(output_file, 'wb') as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(rate)
-            wf.writeframes(audio_data.tobytes())
-        
-        print(f"오디오 파일이 저장되었습니다: {output_file}")
-    
+        print(f"오디오 파일이 저장되었습니다: {self.output_file}")
+        self.converter()
+
     def Detecting(self, index): # 음성인식하는 로직을 바꾸자 recognition으로 실시간으로 바꾸는게 아니라 Enter를 누르기 전까지 계속 녹음을 하고 이거를 text로 변환해서 넘겨주자
         try:
             mic = self.detection.Microphone(device_index=index)

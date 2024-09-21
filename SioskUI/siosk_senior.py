@@ -1,4 +1,3 @@
-
 import flet as ft
 from flet import View
 import random
@@ -10,6 +9,9 @@ from auto.voice import play_wav
 from typing import Callable
 import os
 import sys
+from Siosk.package.audio import AudioRecorder
+
+Power_Detecor = False
 
 def resource_path(relative_path):
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +28,24 @@ def build_siosk_order_view(
         data_arrange: list,
         current_working_directory: str,
         sound,
+        recorder: AudioRecorder,
     ):
+
+    def threading_process():
+        global recorder_thread, Power_Detecor
+        if not Power_Detecor:
+            recorder_thread = threading.Thread(target=recorder.record_audio)
+            recorder_thread.start()
+            Power_Detecor = True
+        else:
+            recorder.stop_recording()
+            # recorder_thread.join()
+            Power_Detecor = False
+
+    def on_keyboard(e: ft.KeyboardEvent):
+        if e.key == "Enter":
+            threading_process()
+
     def close_dlg(e):
         dlg_modal.open = False
         page.update()
@@ -581,6 +600,7 @@ def build_siosk_order_view(
     )
     
     page.add(column_content)
+    page.on_keyboard_event = on_keyboard
     animate_containers(containers)
     return View(
         route="/general_order",

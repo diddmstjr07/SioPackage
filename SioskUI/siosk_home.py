@@ -11,18 +11,18 @@ def build_home_view(
         width_ele,
     ):
 
-    def ask_res():
-        while True:
-            A = api.detecting() # As Thread run, detecting my voice and convert as text to get response of question 
-            if A == "결제페이지로 이동하겠습니다":
-                print("Breaking")
-                break
+    # def ask_res():
+    #     while True:
+    #         A = api.detecting() # As Thread run, detecting my voice and convert as text to get response of question 
+    #         if A == "결제페이지로 이동하겠습니다":
+    #             print("Breaking")
+    #             break
     
     def senior_mode(e):
-        voice = threading.Thread(target=ask_res)
-        voice.start()
+        # voice = threading.Thread(target=ask_res)
+        # voice.start()
         page.go('/siosk_order')
-        voice.join()
+        # voice.join()
     
     content0 = ft.Column(
         [

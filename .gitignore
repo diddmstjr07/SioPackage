@@ -9,3 +9,4 @@ Siosk/assets/audio/
 pyvenv.cfg
 *.spec
 conversation.json
+test.py

@@ -1,9 +1,10 @@
 from .converter import SpeechToTextConverter
 from auto.clear_terminal import clear_terminal
+from Siosk.package.audio import AudioRecorder
 import os
 
 class NeuronAggregate:
-    def __init__(self) -> None:
+    def __init__(self, record: AudioRecorder) -> None:
         import google_speech 
         import speech_recognition
         import os
@@ -13,12 +14,13 @@ class NeuronAggregate:
         self.TTS = google_speech
         self.time = time
         self.os = os
+        self.record = record
     
     def Neuron(self):
         pass
 
     def Detection(self):
-        micro_result = self.converter.check_microphone() # 반환한 마이크 배열 데이터를 변수에 저장
+        micro_result = self.record.check_microphone() # 반환한 마이크 배열 데이터를 변수에 저장
         # for i in range(len(micro_result)):
         #     if "Mic" or "mic" or "마이크" in micro_result[i]:
         #         os.system(clear_terminal())
@@ -36,8 +38,7 @@ class NeuronAggregate:
             except ValueError:
                 print("\033[31m" + "ERROR" + "\033[0m" + ": " "     Please type only integer texture")
 
-
-    def Trans(self, index):
-        text_result = self.converter.Detecting(index) # 인식된 text를 다시 변환
-        print("text_result: " + str(text_result)) # String으로 변환하여 결과 출력
-        return text_result # 바로 인식된 경우, 바로 반환
+    # def Trans(self, index):
+    #     text_result = self.converter.Detecting(index) # 인식된 text를 다시 변환
+    #     print("text_result: " + str(text_result)) # String으로 변환하여 결과 출력
+    #     return text_result # 바로 인식된 경우, 바로 반환
