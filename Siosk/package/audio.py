@@ -1,9 +1,9 @@
 import pyaudio
 import wave
 import threading
-import requests
 import os
 import time
+from Siosk.package.exit_manager import EXITING
 
 class AudioRecorder:
     def __init__(
@@ -34,7 +34,7 @@ class AudioRecorder:
     
     def record_audio(self):
         audio = pyaudio.PyAudio()
-        print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     Device {self.detected[self.mic]} set as Microphone")
+        print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     \nDevice {self.detected[self.mic]} set as Microphone")
         cnt=0
         for _ in range(2):
             try:
@@ -49,15 +49,15 @@ class AudioRecorder:
             except OSError:
                 if cnt == 1:
                     print("\033[1;91m" + "ERROR" + "\033[0m" + ":" + f"    Automatic trouble shooting Failed :(")
-                    os._exit(0)
+                    EXITING()
                 print("\033[1;91m" + "ERROR" + "\033[0m" + ":" + f"    Please check {self.detected[self.mic]} device is Microphone\n")
                 print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     Automatic trouble shooting...")
                 self.mic = 1
                 cnt += 1
             except Exception as e:
                 print("\033[1;91m" + "ERROR" + "\033[0m" + ":" + f"    Unpredictable error occured")
-                os._exit(0)
-        print("\033[33m" + "LOG" + "\033[0m" + ":" + f"      Starting Recording...")
+                EXITING()
+        print("\033[33m" + "\nLOG" + "\033[0m" + ":" + f"      Starting Recording...")
         if os.path.exists(self.output_file):
             os.remove(self.output_file)  # Remove the previous file if it exists
         
@@ -81,8 +81,9 @@ class AudioRecorder:
             wf.setframerate(self.rate)
             wf.writeframes(b''.join(self.frames))
         print("\033[33m" + "LOG" + "\033[0m" + ":" + f"      Audio file stored at: {self.output_file}\n")
-        self.converter()
+        text, embedding_time = self.converter()
         self.recording = False  # Reset recording state for the next session
+        return text, embedding_time
 
     def stop_recording(self):
         self.recording = False
@@ -92,14 +93,15 @@ class AudioRecorder:
         st_time = time.time()
         recognizer = self.detection.Recognizer()
         with self.detection.AudioFile(self.output_file) as source:
-            recognizer.adjust_for_ambient_noise(source, duration=1)
             audio_data = recognizer.record(source)  # Read the entire audio file
         try:
             text = recognizer.recognize_google(audio_data, language="ko-KR")  # Change language if needed
             print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     Recognized Text: ", text)
+            nd_time = time.time()
+            print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     Detection processing time: ", nd_time - st_time)
+            return text, nd_time - st_time
         except self.detection.UnknownValueError:
             print("\033[1;91m" + "ERROR" + "\033[0m" + ":" + f"    Could not understand audio")
+            EXITING()
         except self.detection.RequestError as e:
             print("\033[1;91m" + "ERROR" + "\033[0m" + ":" + f"    Could not request results from Google Speech Recognition service; {e}")
-        nd_time = time.time()
-        print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     Processing time: ", nd_time - st_time)

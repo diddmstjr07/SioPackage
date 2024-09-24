@@ -2,9 +2,11 @@ from .neuron import NeuronAggregate
 from Siosk.package.anoask import Api
 from Siosk.package.TTS import TextToSpeech
 from Siosk.package.audio import AudioRecorder
+from Siosk.package.exit_manager import EXITING
 import os
 import six
 import asyncio
+import time
 
 class API:
     def __init__(self, token, url) -> str:
@@ -59,7 +61,7 @@ class API:
             Q, A, F, embedding_time = self.api.send_response(self.token, keyword) # 위에서 매개변수로 삼은 token과 받은 keyword를 매개변수로써 전송
             return Q, A, F, embedding_time # 다시 결과와 시간을 return
         else:
-            os._exit(0) # 문자의 종류가 str이 아닌 경우 exit
+            EXITING() # 문자의 종류가 str이 아닌 경우 exit
 
     def detection(self, ques:str, result:str, flag:str): # API로부터 반환되어진 result 값을 인자로
         filename = str("Siosk/assets/audio/" + result.replace('?', ";") + ".mp3") # file name creation
@@ -102,7 +104,6 @@ class API:
                 splited_menu = "order"
         else:
             splited_menu = Q
-            print(splited_menu)
         return splited_menu
     
     def logger(self, classified, flag):
@@ -119,11 +120,15 @@ class API:
                 mod.write(str(classified) + " | " + str(flag))
     
     def detecting(self): # SioPackage/main.py 
-        self.keyword = self.Neuron.Trans(self.index) # 음성 정보를 keyword로써 변환후 변수에 저장
-        print(self.keyword) # 단어 출력
+        total_st_time = time.time()
+        self.keyword, time_step = self.Neuron.Trans() # 음성 정보를 keyword로써 변환후 변수에 저장
+        st = time.time()
         Q, A, F, embedding_time = self.api.send_response(self.token, self.keyword) # 위에서 매개변수로 삼은 token과 받은 keyword를 매개변수로써 전송
-        print(embedding_time) # 시간 출력
-        print("Talking...")
+        en = time.time()
+        total_en_time = time.time()
+        print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     Answer creation term: ", embedding_time)
+        print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     Server response time: ", en - st)
+        print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     Total taken time: {total_en_time - total_st_time}")
         classified = self.classifying(Q, F)
         self.logger(classified=classified, flag=F)
         self.detection(Q, A, F) # detection 함수 호출 여기가 말하는 부분 TTS

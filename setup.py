@@ -1,9 +1,10 @@
 import asyncio
 import sys, os
+from Siosk.package.exit_manager import EXITING
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 def unpredictable_problem():
     print("\033[31m" + "ERROR" + "\033[0m" + ":" "     Unpredictable problem detected Exiting...")
-    os._exit(0)
+    EXITING()
 try:
     from Siosk.package.TTS import TextToSpeech
     import platform
@@ -79,7 +80,7 @@ class SetupProcess:
                     destination_path = os.path.join(move_to, os.path.basename(file_name))
                     shutil.move(extracted_path, destination_path)
                     progress_bar.update(1)
-                    time.sleep(0.5) 
+                    time.sleep(0.5)
                     progress_bar.close()
                     return
             progress_bar.close()

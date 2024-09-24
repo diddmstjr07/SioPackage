@@ -2,7 +2,6 @@ import flet as ft
 from flet import View, RouteChangeEvent
 import os
 import requests
-import Siosk.package.download as download
 from Siosk.package.TTS import TextToSpeech
 from Siosk.package.scan import find_process_by_port_Voice
 from SioskUI.siosk_home import build_home_view
@@ -11,6 +10,7 @@ from SioskUI.siosk_senior import build_siosk_order_view
 from SioskUI.siosk_developer import administrator_page
 from SioskUI.siosk_general_order import from_general_order
 from SioskUI.siosk_senior_order import from_siosk_order
+from Siosk.package.exit_manager import EXITING
 from Siosk.package.model import API
 from Siosk.package.audio import AudioRecorder
 import sys
@@ -33,10 +33,10 @@ class UI:
             res = requests.get(f"http://127.0.0.1:9460/api?token=SioskKioskFixedTokenVerifyingTokenData&ques=안녕", verify=False)
         except requests.exceptions.ConnectionError:
             print("\033[1;91m" + "ERROR" + "\033[0m" + ":" + f"    Is your Server is Waken??")
-            os._exit(0)
+            EXITING()
         print("\033[1;32m" + "INFO" + "\033[0m" + ":" + f"     {res}")
         save_dir = "Siosk/package/" # Conversation.json이 있는지 확인하고 없으면 서버에서 다운로드
-        download.download_file(file="conversation_en.json", save_dir=save_dir) # Conversation.json이 있는지 확인하고 없으면 서버에서 다운로드
+        # download.download_file(file="conversation_en.json", save_dir=save_dir) # Conversation.json이 있는지 확인하고 없으면 서버에서 다운로드
         self.TextToSpeech = TextToSpeech()
         self.sound = "assets/audio/click.wav"
         ip_address = "127.0.0.1"
@@ -154,11 +154,11 @@ class UI:
                     print("\033[33m" + "LOG" + "\033[0m" + ":" + f"     Data getting: {data_arrange[0]}")
                     return data_arrange[0]
                 except IndexError:
-                    return None # 이부분은 개발이 완료되어지면 보안을 위해서 꼭 os._exit(0)으로 변환해주어야함.
+                    return None # 이부분은 개발이 완료되어지면 보안을 위해서 꼭 EXITING()으로 변환해주어야함.
                 except Exception as e:
                     print("\033[1;91m" + "ERROR" + "\033[0m" + ":" + f"     Exception detected: {e}")
             else:
-                os._exit(0)
+                EXITING()
         
         # store_getting_lowdata(1, None) 주문했던걸 반환해줌
         def build_payment_order_view():
@@ -195,6 +195,7 @@ class UI:
             elif page.route == "/siosk_order":
                 page.views.append(
                     build_siosk_order_view(
+                        api=self.api,
                         page=page,
                         drinks=drinks,
                         MENU=MENU,

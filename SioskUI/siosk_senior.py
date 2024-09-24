@@ -10,14 +10,18 @@ from typing import Callable
 import os
 import sys
 from Siosk.package.audio import AudioRecorder
+from Siosk.package.model import API
+from Siosk.package.exit_manager import EXITING
 
 Power_Detecor = False
+Animation_Handler = False
 
 def resource_path(relative_path):
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
 def build_siosk_order_view(
+        api: API,
         page: ft.Page,
         drinks: list,
         MENU: list,
@@ -31,16 +35,24 @@ def build_siosk_order_view(
         recorder: AudioRecorder,
     ):
 
+    def ask_res():
+        A = api.detecting()
+        if A == "결제페이지로 이동하겠습니다":
+            print("Breaking")
+            EXITING()
+    
     def threading_process():
-        global recorder_thread, Power_Detecor
+        global recorder_thread, Power_Detecor, Animation_Handler
         if not Power_Detecor:
-            recorder_thread = threading.Thread(target=recorder.record_audio)
+            recorder_thread = threading.Thread(target=ask_res) # As Thread run, detecting my voice and convert as text to get response of question 
             recorder_thread.start()
             Power_Detecor = True
+            Animation_Handler = True
         else:
             recorder.stop_recording()
             # recorder_thread.join()
             Power_Detecor = False
+            Animation_Handler = False
 
     def on_keyboard(e: ft.KeyboardEvent):
         if e.key == "Enter":
@@ -561,12 +573,17 @@ def build_siosk_order_view(
             page.add(container)  # 각 컨테이너를 페이지에 추가
 
         def toggle_height():
-            while True:
-                for container in containers:
-                    new_height = random.randint(25, 100)
-                    container.height = new_height
-                    page.update()  # 이제 안전하게 업데이트 가능
-                time.sleep(0.5)
+            try:
+                while True:
+                    if Animation_Handler == False:
+                        continue
+                    for container in containers:
+                        new_height = random.randint(25, 100)
+                        container.height = new_height
+                        page.update()  # 이제 안전하게 업데이트 가능
+                    time.sleep(0.5)
+            except RuntimeError:
+                EXITING()
         thread = threading.Thread(target=toggle_height)
         thread.daemon = True
         thread.start()

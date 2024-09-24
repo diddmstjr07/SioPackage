@@ -1,4 +1,3 @@
-from .converter import SpeechToTextConverter
 from auto.clear_terminal import clear_terminal
 from Siosk.package.audio import AudioRecorder
 import os
@@ -9,7 +8,6 @@ class NeuronAggregate:
         import speech_recognition
         import os
         import time
-        self.converter = SpeechToTextConverter() # 모델 로드, Google_Speech, SpeechRecognition converter 변수에 저장
         self.detection = speech_recognition
         self.TTS = google_speech
         self.time = time
@@ -38,7 +36,6 @@ class NeuronAggregate:
             except ValueError:
                 print("\033[31m" + "ERROR" + "\033[0m" + ": " "     Please type only integer texture")
 
-    # def Trans(self, index):
-    #     text_result = self.converter.Detecting(index) # 인식된 text를 다시 변환
-    #     print("text_result: " + str(text_result)) # String으로 변환하여 결과 출력
-    #     return text_result # 바로 인식된 경우, 바로 반환
+    def Trans(self):
+        text, embedding_time = self.record.record_audio()
+        return text, embedding_time
